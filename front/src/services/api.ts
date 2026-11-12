@@ -1,0 +1,41 @@
+// ==========================================
+// Cliente HTTP Axios e Configurações de Integração
+// ==========================================
+import axios, { AxiosError } from 'axios';
+
+export const TOKEN_KEY = 'aurea_token';
+export const USER_KEY = 'aurea_user';
+export const MOCK_MODE_KEY = 'aurea_mock_mode';
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 4000,
+});
+
+// Interceptor de Requisição: Injeta Token JWT
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Interceptor de Resposta: Tratamento de Sessão Expirada
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+

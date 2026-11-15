@@ -13,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Regras de negócio de clientes:
- * normalização e validação de CPF (11 dígitos), unicidade de CPF/e-mail e exclusão lógica.
- */
 @Service
 public class ClienteService {
 

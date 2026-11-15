@@ -11,7 +11,7 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { login, isMock, toggleMock } = useAuth();
+  const { login } = useAuth();
   const { toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
@@ -39,7 +39,6 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4 relative transition-colors">
-      {/* Theme Toggle Button (Sol e Lua) in Login Page Corner */}
       <button
         type="button"
         onClick={toggleTheme}
@@ -55,20 +54,8 @@ export const Login: React.FC = () => {
         )}
       </button>
 
-      {/* Hidden button for backward-compatibility if tested by id */}
-      <button
-        data-testid="login-toggle-mode"
-        onClick={toggleMock}
-        className="hidden"
-        aria-hidden="true"
-        tabIndex={-1}
-      >
-        {isMock ? 'Mock' : 'API'}
-      </button>
-
       <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8 transition-colors">
         
-        {/* Brand Header with Stylized Diamond Logo */}
         <div className="text-center mb-6">
           <div className="inline-flex w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/80 items-center justify-center text-amber-600 dark:text-amber-400 mb-3 shadow-2xs">
             <Gem className="w-6 h-6 stroke-[2.2]" />
@@ -131,7 +118,6 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        {/* Quick Credentials for Evaluation / Demonstration */}
         <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
           <p className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center mb-2.5 font-semibold">
             Operadores para Homologação &amp; Teste:

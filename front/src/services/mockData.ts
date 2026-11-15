@@ -1,7 +1,3 @@
-// ==========================================
-// Base de Dados Inicial para Simulação Local / Mock
-// Permite testes e gravação do vídeo mesmo antes do backend estar no ar
-// ==========================================
 import type { Usuario, Cliente, Joia, Venda } from '../types';
 
 export const INITIAL_USUARIOS: Usuario[] = [

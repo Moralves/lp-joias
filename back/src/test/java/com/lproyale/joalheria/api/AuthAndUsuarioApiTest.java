@@ -15,14 +15,12 @@ class AuthAndUsuarioApiTest extends BaseApiTest {
     @Test
     @DisplayName("Deve autenticar com JWT válido, bloquear rotas sem token e impedir login de inativo")
     void deveValidarFluxoJwtELoginInativo() {
-        // Sem token -> 401
         given()
                 .when()
                 .get("/usuarios")
                 .then()
                 .statusCode(401);
 
-        // Login válido -> 200 com JWT
         String token = autenticar("carlos@lproyale.com.br", "123456");
 
         given()
@@ -34,7 +32,6 @@ class AuthAndUsuarioApiTest extends BaseApiTest {
                 .body("size()", equalTo(1))
                 .body("[0].email", equalTo("carlos@lproyale.com.br"));
 
-        // Usuário inativo não faz login -> 403
         Usuario inativo = new Usuario("Lucas Antigo", "lucas@lproyale.com.br", passwordEncoder.encode("123456"));
         inativo.setAtivo(false);
         usuarioRepository.save(inativo);
@@ -54,7 +51,6 @@ class AuthAndUsuarioApiTest extends BaseApiTest {
     void deveValidarAutoInativacaoEInativacaoEReativacao() {
         String token = autenticar("carlos@lproyale.com.br", "123456");
 
-        // Tentativa de auto-inativação -> 409
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -62,7 +58,6 @@ class AuthAndUsuarioApiTest extends BaseApiTest {
                 .then()
                 .statusCode(409);
 
-        // Cria segundo operador
         Integer marinaId = given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -79,7 +74,6 @@ class AuthAndUsuarioApiTest extends BaseApiTest {
                 .extract()
                 .path("id");
 
-        // Inativa segundo operador -> 204
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -87,7 +81,6 @@ class AuthAndUsuarioApiTest extends BaseApiTest {
                 .then()
                 .statusCode(204);
 
-        // Reativa operador -> 200
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()

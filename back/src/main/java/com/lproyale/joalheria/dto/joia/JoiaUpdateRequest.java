@@ -5,10 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
-/**
- * Permite atualização cadastral (nome, categoria, material, preço) quando a joia nunca foi vendida,
- * bem como atualização direta de {@code quantidadeEstoque} (também utilizada pela tela de estoque do front-end).
- */
 public record JoiaUpdateRequest(
         @Size(max = 150, message = "Nome deve ter no máximo 150 caracteres.")
         String nome,

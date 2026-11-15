@@ -12,9 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Autentica funcionários no terminal de vendas (PDV) e emite o token JWT.
- */
 @Service
 public class AuthService {
 

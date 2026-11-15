@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Edit2, Ban, RotateCcw } from 'lucide-react';
 import type { Cliente } from '../types';
 import { clientesService } from '../services/clientesService';
+import { useAuth } from '../contexts/AuthContext';
 import { formatCPF, formatPhone } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 import { Modal } from '../components/ui/Modal';
 
 export const Clientes: React.FC = () => {
+  const { isMock } = useAuth();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
 
-  // Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editCliente, setEditCliente] = useState<Cliente | null>(null);
 
-  // Form
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
@@ -35,7 +35,7 @@ export const Clientes: React.FC = () => {
 
   useEffect(() => {
     loadClientes();
-  }, [showInactive]);
+  }, [showInactive, isMock]);
 
   const handleOpenCreate = () => {
     setEditCliente(null);
@@ -113,7 +113,6 @@ export const Clientes: React.FC = () => {
   return (
     <div className="space-y-5">
       
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-serif">
@@ -146,7 +145,6 @@ export const Clientes: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs transition-colors">
         {loading ? (
           <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-xs font-mono">Carregando lista de clientes...</div>
@@ -234,7 +232,6 @@ export const Clientes: React.FC = () => {
         )}
       </div>
 
-      {/* Modal Criar/Editar */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -11,13 +11,11 @@ export const Usuarios: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
 
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, isMock } = useAuth();
 
-  // Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUsuario, setEditUsuario] = useState<Usuario | null>(null);
 
-  // Form
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('123456');
@@ -36,7 +34,7 @@ export const Usuarios: React.FC = () => {
 
   useEffect(() => {
     loadUsuarios();
-  }, [showInactive]);
+  }, [showInactive, isMock]);
 
   const handleOpenCreate = () => {
     setEditUsuario(null);
@@ -50,6 +48,7 @@ export const Usuarios: React.FC = () => {
     setEditUsuario(u);
     setNome(u.nome);
     setEmail(u.email);
+    setSenha('');
     setIsModalOpen(true);
   };
 
@@ -57,7 +56,11 @@ export const Usuarios: React.FC = () => {
     e.preventDefault();
     try {
       if (editUsuario) {
-        await usuariosService.update(editUsuario.id, { nome, email });
+        const updateData: Partial<Usuario> & { senha?: string } = { nome, email };
+        if (senha.trim().length > 0) {
+          updateData.senha = senha.trim();
+        }
+        await usuariosService.update(editUsuario.id, updateData);
         showToast('Dados do operador atualizados com sucesso.', 'success');
       } else {
         await usuariosService.create({ nome, email, senha });
@@ -100,7 +103,6 @@ export const Usuarios: React.FC = () => {
   return (
     <div className="space-y-5">
       
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-serif">
@@ -133,7 +135,6 @@ export const Usuarios: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs transition-colors">
         {loading ? (
           <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-xs font-mono">Carregando operadores cadastrados...</div>
@@ -234,7 +235,6 @@ export const Usuarios: React.FC = () => {
         )}
       </div>
 
-      {/* Modal Criar/Editar */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -267,20 +267,21 @@ export const Usuarios: React.FC = () => {
             />
           </div>
 
-          {!editUsuario && (
-            <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Senha Provisória de Acesso *</label>
-              <input
-                type="password"
-                required
-                data-testid="input-usuario-senha"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-              />
-            </div>
-          )}
+          <div>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+              {editUsuario ? 'Nova Senha (deixe em branco para manter a atual)' : 'Senha Provisória de Acesso *'}
+            </label>
+            <input
+              type="password"
+              required={!editUsuario}
+              minLength={6}
+              data-testid="input-usuario-senha"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder={editUsuario ? 'Opcional (mínimo 6 caracteres)' : 'Mínimo 6 caracteres'}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+            />
+          </div>
 
           <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end space-x-2">
             <button

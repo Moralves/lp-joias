@@ -16,16 +16,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: ${SERVER_PORT:8080}
 
 app:
   jwt:
-    # Chave HS256 em Base64 (>= 256 bits). Em produção, definir via variável de ambiente JWT_SECRET.
     secret: ${JWT_SECRET:TFBSb3lhbGUtSm9hbGhlcmlhLVNlY3JldC1LZXktMjAyNi1Qcm9qZXRvLU4yLVRlc3Rlcw==}
-    expiration-ms: ${JWT_EXPIRATION_MS:28800000} # 8 horas (expediente de caixa)
+    expiration-ms: ${JWT_EXPIRATION_MS:28800000}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
 

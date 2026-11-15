@@ -1,8 +1,3 @@
-// ==========================================
-// L&P ROYALE - SISTEMA DE VENDAS DE JOALHERIA
-// Definições de Tipos e Contratos de Dados
-// ==========================================
-
 export interface Usuario {
   id: number;
   nome: string;
@@ -22,12 +17,12 @@ export interface Cliente {
 export interface Joia {
   id: number;
   nome: string;
-  categoria: string; // "Anel", "Colar", "Brinco", "Pulseira", etc.
-  material: string;  // "Ouro 18k", "Prata 925", etc.
+  categoria: string;
+  material: string;
   preco: number;
   quantidadeEstoque: number;
   ativo: boolean;
-  possuiVendas: boolean; // Calculado pelo backend em tempo de execução
+  possuiVendas: boolean;
 }
 
 export interface ItemVenda {
@@ -35,7 +30,7 @@ export interface ItemVenda {
   joiaId: number;
   joia?: Joia;
   quantidade: number;
-  precoUnitario?: number; // Preço gravado no momento da venda
+  precoUnitario?: number;
 }
 
 export interface Venda {
@@ -50,7 +45,6 @@ export interface Venda {
   itens: ItemVenda[];
 }
 
-// Payload exigido pelo backend para POST e PUT de vendas
 export interface VendaPayload {
   clienteId: number;
   itens: {
@@ -59,7 +53,6 @@ export interface VendaPayload {
   }[];
 }
 
-// Autenticação
 export interface LoginCredentials {
   email: string;
   senha: string;

@@ -28,10 +28,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Configuração central de segurança stateless com JWT e BCrypt.
- * Garante retorno JSON padronizado (HTTP 401) para acessos sem token válido.
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -75,7 +71,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api", "/api/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

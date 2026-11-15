@@ -34,7 +34,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .extract()
                 .path("id");
 
-        // CPF duplicado -> 409
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -49,7 +48,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .then()
                 .statusCode(409);
 
-        // Inativação -> 204
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -57,7 +55,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .then()
                 .statusCode(204);
 
-        // Listagem padrão (ativos) não traz o cliente inativo
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -66,7 +63,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .statusCode(200)
                 .body("id", not(hasItem(clienteId)));
 
-        // Listagem com ?ativo=false inclui o cliente inativo
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -75,7 +71,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .statusCode(200)
                 .body("find { it.id == " + clienteId + " }.ativo", equalTo(false));
 
-        // Reativação -> 200
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -104,7 +99,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .post("/joias")
                 .then().statusCode(201).extract().path("id");
 
-        // Exclusão física quando nunca foi vendida
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -121,7 +115,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .post("/joias")
                 .then().statusCode(201).extract().path("id");
 
-        // Registra venda da joia
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -132,7 +125,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .post("/vendas")
                 .then().statusCode(201);
 
-        // Alteração cadastral deve retornar 409 Conflict
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -142,7 +134,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .then()
                 .statusCode(409);
 
-        // Reposição de estoque deve funcionar mesmo após venda
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -154,7 +145,6 @@ class JoiaAndClienteApiTest extends BaseApiTest {
                 .body("quantidadeEstoque", equalTo(20))
                 .body("possuiVendas", equalTo(true));
 
-        // DELETE em joia vendida executa soft delete (inactivated: true)
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()

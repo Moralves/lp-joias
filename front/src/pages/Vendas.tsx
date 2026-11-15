@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Ban, Eye } from 'lucide-react';
-import type { Venda } from '../types';
+import { Ban, Eye, Edit2, Plus, Trash2 } from 'lucide-react';
+import type { Venda, Cliente, Joia } from '../types';
 import { vendasService } from '../services/vendasService';
+import { clientesService } from '../services/clientesService';
+import { joiasService } from '../services/joiasService';
+import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 import { Modal } from '../components/ui/Modal';
 
 export const Vendas: React.FC = () => {
+  const { isMock } = useAuth();
   const [vendas, setVendas] = useState<Venda[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVenda, setSelectedVenda] = useState<Venda | null>(null);
   const [cancelingId, setCancelingId] = useState<number | null>(null);
+
+  const [editingVenda, setEditingVenda] = useState<Venda | null>(null);
+  const [clientesAtivos, setClientesAtivos] = useState<Cliente[]>([]);
+  const [joiasAtivas, setJoiasAtivas] = useState<Joia[]>([]);
+  const [editClienteId, setEditClienteId] = useState<number>(0);
+  const [editItens, setEditItens] = useState<{ joiaId: number; quantidade: number }[]>([]);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const loadVendas = async () => {
     setLoading(true);
@@ -26,7 +37,7 @@ export const Vendas: React.FC = () => {
 
   useEffect(() => {
     loadVendas();
-  }, []);
+  }, [isMock]);
 
   const handleCancelar = async (venda: Venda) => {
     if (venda.status === 'CANCELADA') {
@@ -51,10 +62,71 @@ export const Vendas: React.FC = () => {
     }
   };
 
+  const handleOpenEdit = async (venda: Venda) => {
+    if (venda.status === 'CANCELADA') {
+      showToast('Venda cancelada não pode ser editada.', 'warning');
+      return;
+    }
+    try {
+      const [clis, jois] = await Promise.all([
+        clientesService.getAll(false),
+        joiasService.getAll(false),
+      ]);
+      setClientesAtivos(clis);
+      setJoiasAtivas(jois);
+      setEditClienteId(venda.clienteId);
+      setEditItens(
+        (venda.itens || []).map((i) => ({
+          joiaId: i.joiaId,
+          quantidade: i.quantidade,
+        }))
+      );
+      setEditingVenda(venda);
+    } catch (err: any) {
+      showToast(err.message || 'Erro ao carregar dados para edição da venda.', 'error');
+    }
+  };
+
+  const handleAddEditItem = () => {
+    const usedIds = new Set(editItens.map((i) => i.joiaId));
+    const available = joiasAtivas.find((j) => !usedIds.has(j.id) && j.quantidadeEstoque > 0);
+    if (!available) {
+      showToast('Todas as joias disponíveis em estoque já estão incluídas nesta venda.', 'warning');
+      return;
+    }
+    setEditItens((prev) => [...prev, { joiaId: available.id, quantidade: 1 }]);
+  };
+
+  const handleRemoveEditItem = (index: number) => {
+    setEditItens((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingVenda) return;
+    if (editItens.length === 0) {
+      showToast('A venda deve possuir pelo menos um item.', 'warning');
+      return;
+    }
+    setSavingEdit(true);
+    try {
+      await vendasService.update(editingVenda.id, {
+        clienteId: editClienteId,
+        itens: editItens,
+      });
+      showToast(`Venda #${editingVenda.id} atualizada e estoque recalculado com sucesso.`, 'success');
+      setEditingVenda(null);
+      await loadVendas();
+    } catch (err: any) {
+      showToast(err.message || 'Erro ao atualizar a venda.', 'error');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-serif">
@@ -72,7 +144,6 @@ export const Vendas: React.FC = () => {
         </button>
       </div>
 
-      {/* Table of Sales */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs transition-colors">
         {loading ? (
           <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-xs font-mono">Carregando histórico de vendas...</div>
@@ -140,7 +211,21 @@ export const Vendas: React.FC = () => {
                           title="Visualizar Comprovante"
                           className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-amber-800 dark:hover:text-amber-400 rounded hover:bg-amber-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-4 h-4 inline" />
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenEdit(venda)}
+                          disabled={isCancelada}
+                          data-testid={`btn-editar-venda-${venda.id}`}
+                          title={isCancelada ? 'Venda cancelada não pode ser editada' : 'Editar cliente e itens da venda'}
+                          className={`p-1.5 rounded text-xs transition-colors ${
+                            isCancelada
+                              ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-40'
+                              : 'text-slate-500 dark:text-slate-400 hover:text-amber-800 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-800 cursor-pointer'
+                          }`}
+                        >
+                          <Edit2 className="w-4 h-4 inline" />
                         </button>
 
                         <button
@@ -170,7 +255,6 @@ export const Vendas: React.FC = () => {
         )}
       </div>
 
-      {/* Modal: Comprovante Detalhado da Venda */}
       <Modal
         isOpen={!!selectedVenda}
         onClose={() => setSelectedVenda(null)}
@@ -184,8 +268,10 @@ export const Vendas: React.FC = () => {
                 <span className="font-mono text-slate-900 dark:text-white font-medium">{formatDateTime(selectedVenda.dataVenda)}</span>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-400 block">Forma de Pagamento</span>
-                <span className="font-semibold text-slate-900 dark:text-white">Balcão / À Vista</span>
+                <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-400 block">Status da Operação</span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {selectedVenda.status === 'CANCELADA' ? 'CANCELADA (Estoque Estornado)' : 'CONCLUÍDA'}
+                </span>
               </div>
               <div>
                 <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-400 block">Cliente Comprador</span>
@@ -220,7 +306,6 @@ export const Vendas: React.FC = () => {
               </div>
             </div>
 
-            {/* Total Display (100% Light in Light Mode, Dark in Dark Mode) */}
             <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-sm bg-amber-50/90 dark:bg-slate-900 text-slate-900 dark:text-white p-3.5 rounded-lg border border-amber-300 dark:border-slate-800 shadow-xs transition-colors">
               <span className="font-semibold text-amber-950 dark:text-slate-300">Valor Total Pago:</span>
               <span className="font-mono font-bold text-amber-700 dark:text-amber-400 text-lg">
@@ -228,6 +313,118 @@ export const Vendas: React.FC = () => {
               </span>
             </div>
           </div>
+        )}
+      </Modal>
+
+      <Modal
+        isOpen={!!editingVenda}
+        onClose={() => setEditingVenda(null)}
+        title={editingVenda ? `Editar Venda #${editingVenda.id}` : ''}
+      >
+        {editingVenda && (
+          <form onSubmit={handleSaveEdit} className="space-y-4 text-xs">
+            <div>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                Cliente Comprador *
+              </label>
+              <select
+                value={editClienteId}
+                onChange={(e) => setEditClienteId(Number(e.target.value))}
+                data-testid="select-edit-venda-cliente"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-amber-500"
+              >
+                {clientesAtivos.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="font-medium text-slate-700 dark:text-slate-300">
+                  Itens da Venda *
+                </label>
+                <button
+                  type="button"
+                  onClick={handleAddEditItem}
+                  className="inline-flex items-center space-x-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Adicionar Peça</span>
+                </button>
+              </div>
+
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {editItens.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg border border-slate-200 dark:border-slate-700"
+                  >
+                    <select
+                      value={item.joiaId}
+                      onChange={(e) => {
+                        const newJoiaId = Number(e.target.value);
+                        setEditItens((prev) =>
+                          prev.map((row, i) => (i === idx ? { ...row, joiaId: newJoiaId } : row))
+                        );
+                      }}
+                      className="flex-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 text-slate-900 dark:text-slate-100"
+                    >
+                      {joiasAtivas.map((j) => (
+                        <option key={j.id} value={j.id}>
+                          {j.nome} ({formatCurrency(j.preco)})
+                        </option>
+                      ))}
+                    </select>
+
+                    <input
+                      type="number"
+                      min={1}
+                      required
+                      value={item.quantidade}
+                      onChange={(e) => {
+                        const qty = Math.max(1, Number(e.target.value));
+                        setEditItens((prev) =>
+                          prev.map((row, i) => (i === idx ? { ...row, quantidade: qty } : row))
+                        );
+                      }}
+                      className="w-16 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 text-center font-mono text-slate-900 dark:text-slate-100"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveEditItem(idx)}
+                      disabled={editItens.length <= 1}
+                      title="Remover item"
+                      className="p-1.5 text-slate-400 hover:text-rose-600 disabled:opacity-30 cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setEditingVenda(null)}
+                className="px-3 py-2 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={savingEdit}
+                data-testid="btn-salvar-edicao-venda"
+                className="font-semibold bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded-lg uppercase tracking-wider cursor-pointer shadow-2xs disabled:opacity-50"
+              >
+                {savingEdit ? 'Salvando...' : 'Salvar Alterações'}
+              </button>
+            </div>
+          </form>
         )}
       </Modal>
 

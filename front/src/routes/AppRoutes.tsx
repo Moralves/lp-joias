@@ -22,7 +22,6 @@ export const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-      {/* Rotas Autenticadas */}
       <Route
         path="/"
         element={
@@ -38,7 +37,6 @@ export const AppRoutes: React.FC = () => {
         <Route path="usuarios" element={<Usuarios />} />
       </Route>
 
-      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

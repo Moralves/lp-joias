@@ -14,10 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Filtro stateless que intercepta requisições com {@code Authorization: Bearer <token>},
- * valida a assinatura JWT e confirma que o usuário segue ativo no banco.
- */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

@@ -2,10 +2,6 @@ package com.lproyale.joalheria.domain.entity;
 
 import jakarta.persistence.*;
 
-/**
- * Funcionário da joalheria autorizado a operar o sistema (PDV e cadastros).
- * Nunca sofre exclusão física: utiliza flag {@code ativo} para soft delete.
- */
 @Entity
 @Table(name = "usuarios")
 public class Usuario {

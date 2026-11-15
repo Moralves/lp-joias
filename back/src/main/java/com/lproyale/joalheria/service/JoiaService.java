@@ -14,11 +14,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Regras de negócio do catálogo de joias:
- * validação de preço/estoque, bloqueio cadastral (HTTP 409) para joias já vendidas,
- * reposição de estoque sempre permitida e exclusão condicional (física vs lógica).
- */
 @Service
 public class JoiaService {
 

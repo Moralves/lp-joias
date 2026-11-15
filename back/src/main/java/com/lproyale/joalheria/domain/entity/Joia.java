@@ -3,11 +3,6 @@ package com.lproyale.joalheria.domain.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * Peça do catálogo da joalheria com controle de saldo físico em loja.
- * Exclusão física permitida apenas se nunca participou de nenhuma venda;
- * caso contrário, utiliza soft delete via {@code ativo = false}.
- */
 @Entity
 @Table(name = "joias")
 public class Joia {

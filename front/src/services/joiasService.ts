@@ -1,10 +1,9 @@
-// ==========================================
-// Serviço do Catálogo de Joias e Estoque
-// ==========================================
 import { api } from './api';
 import { isMockModeExplicit, isNetworkError } from './clientHelper';
 import { localStore } from './store';
 import type { Joia } from '../types';
+
+const OFFLINE_MSG = 'Servidor da API Spring Boot indisponível em http://localhost:8080. Verifique se o back-end está em execução.';
 
 export const joiasService = {
   async getAll(includeInactive = false): Promise<Joia[]> {
@@ -16,7 +15,7 @@ export const joiasService = {
       const res = await api.get<Joia[]>(url);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.getJoias(includeInactive);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Falha ao buscar joias.');
     }
   },
@@ -31,11 +30,7 @@ export const joiasService = {
       const res = await api.get<Joia>(`/joias/${id}`);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) {
-        const found = localStore.getJoias(true).find(j => j.id === id);
-        if (!found) throw new Error('Joia não encontrada.');
-        return found;
-      }
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao carregar detalhes da joia.');
     }
   },
@@ -48,7 +43,7 @@ export const joiasService = {
       const res = await api.post<Joia>('/joias', data);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.createJoia(data);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao cadastrar joia.');
     }
   },
@@ -61,7 +56,7 @@ export const joiasService = {
       const res = await api.put<Joia>(`/joias/${id}`, data);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.updateJoia(id, data);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       const msg = err.response?.data?.message;
       if (err.response?.status === 409) {
         throw new Error(msg || 'Joia já participou de venda e não pode ter dados alterados (409 Conflict).');
@@ -78,7 +73,7 @@ export const joiasService = {
       const res = await api.delete(`/joias/${id}`);
       return res.data || { deleted: true, inactivated: false };
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.deleteOrInactivateJoia(id);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao remover ou inativar joia.');
     }
   },
@@ -91,7 +86,7 @@ export const joiasService = {
       const res = await api.put<Joia>(`/joias/${id}/reativar`);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.reativarJoia(id);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao reativar joia.');
     }
   },
@@ -101,11 +96,10 @@ export const joiasService = {
       return localStore.ajustarEstoque(id, novaQuantidade);
     }
     try {
-      // Tenta rota específica de reposição ou PUT/PATCH
       const res = await api.patch<Joia>(`/joias/${id}/estoque`, { quantidadeEstoque: novaQuantidade });
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.ajustarEstoque(id, novaQuantidade);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao repor estoque da joia.');
     }
   }

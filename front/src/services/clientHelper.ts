@@ -1,13 +1,13 @@
-// ==========================================
-// Gerenciador de Conexão: API REST Spring Boot vs Simulação Local
-// ==========================================
-import { MOCK_MODE_KEY } from './api';
+import { MOCK_MODE_KEY, TOKEN_KEY } from './api';
 
 export function isMockModeExplicit(): boolean {
-  const stored = localStorage.getItem(MOCK_MODE_KEY);
-  // Por padrão, se não configurado explicitamente, inicia em Modo Local para teste imediato
-  if (stored === null) {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token && token.startsWith('mock-jwt-token-')) {
     return true;
+  }
+  const stored = localStorage.getItem(MOCK_MODE_KEY);
+  if (stored === null) {
+    return false;
   }
   return stored === 'true';
 }

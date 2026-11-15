@@ -1,14 +1,3 @@
--- =============================================================================
--- L&P Royale - Script SQL PostgreSQL (para uso no DBeaver)
--- =============================================================================
--- Passo 1: Conectado ao banco padrão "postgres" no DBeaver, execute:
---   CREATE DATABASE lp_joias;
--- Passo 2: Conecte-se ao banco "lp_joias" e (opcionalmente) execute este script.
---   Observação: A aplicação Spring Boot também cria/atualiza as tabelas
---   automaticamente via JPA (ddl-auto: update) e popula os dados iniciais
---   via DataSeeder com senhas criptografadas em BCrypt.
--- =============================================================================
-
 CREATE TABLE IF NOT EXISTS usuarios (
     id      BIGSERIAL PRIMARY KEY,
     nome    VARCHAR(120) NOT NULL,
@@ -61,7 +50,6 @@ CREATE TABLE IF NOT EXISTS itens_venda (
     CONSTRAINT chk_item_preco_positivo CHECK (preco_unitario > 0)
 );
 
--- Índices auxiliares para consultas frequentes de listagem e histórico
 CREATE INDEX IF NOT EXISTS idx_usuarios_ativo ON usuarios (ativo);
 CREATE INDEX IF NOT EXISTS idx_clientes_ativo ON clientes (ativo);
 CREATE INDEX IF NOT EXISTS idx_joias_ativo ON joias (ativo);

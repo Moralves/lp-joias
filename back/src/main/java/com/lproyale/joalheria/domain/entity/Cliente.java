@@ -2,10 +2,6 @@ package com.lproyale.joalheria.domain.entity;
 
 import jakarta.persistence.*;
 
-/**
- * Cliente comprador registrado na joalheria.
- * Nunca sofre exclusão física para preservar integridade fiscal do histórico de vendas.
- */
 @Entity
 @Table(name = "clientes")
 public class Cliente {

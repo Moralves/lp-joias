@@ -1,10 +1,9 @@
-// ==========================================
-// Serviço de Gerenciamento de Clientes
-// ==========================================
 import { api } from './api';
 import { isMockModeExplicit, isNetworkError } from './clientHelper';
 import { localStore } from './store';
 import type { Cliente } from '../types';
+
+const OFFLINE_MSG = 'Servidor da API Spring Boot indisponível em http://localhost:8080. Verifique se o back-end está em execução.';
 
 export const clientesService = {
   async getAll(includeInactive = false): Promise<Cliente[]> {
@@ -16,7 +15,7 @@ export const clientesService = {
       const res = await api.get<Cliente[]>(url);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.getClientes(includeInactive);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao carregar clientes.');
     }
   },
@@ -29,7 +28,7 @@ export const clientesService = {
       const res = await api.post<Cliente>('/clientes', data);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.createCliente(data);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao cadastrar cliente.');
     }
   },
@@ -42,7 +41,7 @@ export const clientesService = {
       const res = await api.put<Cliente>(`/clientes/${id}`, data);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.updateCliente(id, data);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao atualizar cliente.');
     }
   },
@@ -54,7 +53,7 @@ export const clientesService = {
     try {
       await api.delete(`/clientes/${id}`);
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.inativarCliente(id);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao inativar cliente.');
     }
   },
@@ -67,7 +66,7 @@ export const clientesService = {
       const res = await api.put<Cliente>(`/clientes/${id}/reativar`);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.reativarCliente(id);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao reativar cliente.');
     }
   }

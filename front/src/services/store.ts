@@ -1,7 +1,3 @@
-// ==========================================
-// Armazenamento em Memória / Simulação Local
-// Implementa exatamente as 26 Regras de Negócio do Escopo
-// ==========================================
 import type { Usuario, Cliente, Joia, Venda, VendaPayload, LoginCredentials, AuthResponse } from '../types';
 import { INITIAL_USUARIOS, INITIAL_CLIENTES, INITIAL_JOIAS, INITIAL_VENDAS } from './mockData';
 
@@ -24,7 +20,6 @@ class LocalStore {
     this.currentUser = this.usuarios[0];
   }
 
-  // --- AUTH ---
   login(creds: LoginCredentials): AuthResponse {
     const input = creds.email.toLowerCase();
     const user = this.usuarios.find(u => {
@@ -38,7 +33,6 @@ class LocalStore {
     if (!user) {
       throw new Error('E-mail ou senha inválidos.');
     }
-    // Regra 9: Usuário inativo não consegue fazer login
     if (!user.ativo) {
       throw new Error('Usuário inativo não tem permissão para acessar o sistema.');
     }
@@ -49,13 +43,11 @@ class LocalStore {
     };
   }
 
-  // --- USUÁRIOS ---
   getUsuarios(includeInactive = false): Usuario[] {
     return this.usuarios.filter(u => includeInactive || u.ativo);
   }
 
   createUsuario(data: Omit<Usuario, 'id' | 'ativo'>): Usuario {
-    // Regra 8: E-mail de usuário não pode se repetir
     const exists = this.usuarios.some(u => u.email.toLowerCase() === data.email.toLowerCase());
     if (exists) {
       throw new Error('Já existe um usuário cadastrado com este e-mail (409 Conflict).');
@@ -78,7 +70,6 @@ class LocalStore {
   }
 
   inativarUsuario(id: number, currentUserId: number): void {
-    // Regra 13: Um usuário não pode inativar a si mesmo (409)
     if (id === currentUserId) {
       throw new Error('Não é permitido inativar o próprio usuário atualmente autenticado (409 Conflict).');
     }
@@ -90,19 +81,16 @@ class LocalStore {
   reativarUsuario(id: number): Usuario {
     const user = this.usuarios.find(u => u.id === id);
     if (!user) throw new Error('Usuário não encontrado.');
-    // Regra 12: Reativar quem já está ativo retorna 409
     if (user.ativo) throw new Error('O usuário já está ativo (409 Conflict).');
     user.ativo = true;
     return user;
   }
 
-  // --- CLIENTES ---
   getClientes(includeInactive = false): Cliente[] {
     return this.clientes.filter(c => includeInactive || c.ativo);
   }
 
   createCliente(data: Omit<Cliente, 'id' | 'ativo'>): Cliente {
-    // Regra 7: CPF e e-mail não podem se repetir
     const cpfClean = data.cpf.replace(/\D/g, '');
     const cpfExists = this.clientes.some(c => c.cpf.replace(/\D/g, '') === cpfClean);
     if (cpfExists) throw new Error('CPF já cadastrado no sistema (409 Conflict).');
@@ -147,7 +135,6 @@ class LocalStore {
     return cliente;
   }
 
-  // --- JOIAS ---
   getJoias(includeInactive = false): Joia[] {
     return this.joias
       .filter(j => includeInactive || j.ativo)
@@ -162,9 +149,7 @@ class LocalStore {
   }
 
   createJoia(data: Omit<Joia, 'id' | 'ativo' | 'possuiVendas'>): Joia {
-    // Regra 5: Preço maior que zero
     if (data.preco <= 0) throw new Error('O preço da joia deve ser maior que zero.');
-    // Regra 6: Estoque nunca negativo
     if (data.quantidadeEstoque < 0) throw new Error('O estoque da joia não pode ser negativo.');
 
     const newId = Math.max(...this.joias.map(j => j.id), 0) + 1;
@@ -178,7 +163,6 @@ class LocalStore {
     if (!joia) throw new Error('Joia não encontrada.');
 
     const jaVendeu = this.joiaPossuiVendas(id);
-    // Regra 3: Joia que já participou de venda não pode ter dados cadastrais alterados
     if (jaVendeu) {
       if (
         (data.nome && data.nome !== joia.nome) ||
@@ -202,7 +186,6 @@ class LocalStore {
   }
 
   ajustarEstoque(id: number, novaQuantidade: number): Joia {
-    // Regra 4: Ajuste de estoque (reposição) permitido mesmo em joia com vendas
     if (novaQuantidade < 0) throw new Error('Estoque não pode ser negativo.');
     const joia = this.joias.find(j => j.id === id);
     if (!joia) throw new Error('Joia não encontrada.');
@@ -216,11 +199,9 @@ class LocalStore {
 
     const jaVendeu = this.joiaPossuiVendas(id);
     if (jaVendeu) {
-      // Regra 3: Se já participou de venda, DELETE apenas inativa
       this.joias[index].ativo = false;
       return { deleted: false, inactivated: true };
     } else {
-      // Regra 2: Nunca participou de venda: exclusão física definitiva
       this.joias.splice(index, 1);
       return { deleted: true, inactivated: false };
     }
@@ -234,7 +215,6 @@ class LocalStore {
     return { ...joia, possuiVendas: this.joiaPossuiVendas(id) };
   }
 
-  // --- VENDAS ---
   getVendas(): Venda[] {
     return this.vendas.map(v => ({
       ...v,
@@ -248,24 +228,20 @@ class LocalStore {
   }
 
   createVenda(payload: VendaPayload, currentUserId: number): Venda {
-    // Regra 16: Venda exige cliente existente e pelo menos um item
     const cliente = this.clientes.find(c => c.id === payload.clienteId);
     if (!cliente) throw new Error('Cliente inválido ou não encontrado.');
-    // Regra 10: Cliente inativo não pode receber vendas
     if (!cliente.ativo) throw new Error('Não é possível registrar venda para cliente inativo.');
 
     if (!payload.itens || payload.itens.length === 0) {
       throw new Error('A venda deve conter ao menos um item.');
     }
 
-    // Regra 18: Mesma joia não pode aparecer duas vezes na mesma venda
     const joiaIds = payload.itens.map(i => i.joiaId);
     const uniqueIds = new Set(joiaIds);
     if (uniqueIds.size !== joiaIds.length) {
       throw new Error('A mesma joia não pode constar mais de uma vez na mesma venda (Regra 18).');
     }
 
-    // Validações de itens e estoque (Regras 17, 10, 19)
     for (const item of payload.itens) {
       if (item.quantidade <= 0) {
         throw new Error('A quantidade de cada item deve ser maior que zero.');
@@ -277,18 +253,16 @@ class LocalStore {
       if (!joia.ativo) {
         throw new Error(`A joia "${joia.nome}" está inativa e não pode ser vendida.`);
       }
-      // Regra 19: Estoque insuficiente rejeita a venda inteira
       if (item.quantidade > joia.quantidadeEstoque) {
         throw new Error(`Estoque insuficiente para a joia "${joia.nome}". Disponível: ${joia.quantidadeEstoque}, Solicitado: ${item.quantidade}. Venda rejeitada.`);
       }
     }
 
-    // Transação: Realiza baixa de estoque de cada item (Regra 20)
     let valorTotal = 0;
     const itensGravados = payload.itens.map((item, index) => {
       const joia = this.joias.find(j => j.id === item.joiaId)!;
       joia.quantidadeEstoque -= item.quantidade;
-      const precoUnitario = joia.preco; // Regra: preço da época
+      const precoUnitario = joia.preco;
       valorTotal += precoUnitario * item.quantidade;
       return {
         id: index + 1,
@@ -313,15 +287,86 @@ class LocalStore {
     return novaVenda;
   }
 
+  updateVenda(vendaId: number, payload: VendaPayload): Venda {
+    const venda = this.vendas.find(v => v.id === vendaId);
+    if (!venda) throw new Error('Venda não encontrada.');
+    if (venda.status === 'CANCELADA') {
+      throw new Error('Venda cancelada não pode ser editada (409 Conflict).');
+    }
+
+    const cliente = this.clientes.find(c => c.id === payload.clienteId);
+    if (!cliente) throw new Error('Cliente inválido ou não encontrado.');
+    if (!cliente.ativo) throw new Error('Não é possível registrar venda para cliente inativo.');
+
+    if (!payload.itens || payload.itens.length === 0) {
+      throw new Error('A venda deve conter ao menos um item.');
+    }
+
+    const joiaIds = payload.itens.map(i => i.joiaId);
+    if (new Set(joiaIds).size !== joiaIds.length) {
+      throw new Error('A mesma joia não pode constar mais de uma vez na mesma venda.');
+    }
+
+    const precosOriginais = new Map<number, number>();
+    for (const itemAntigo of venda.itens) {
+      if (itemAntigo.precoUnitario !== undefined) {
+        precosOriginais.set(itemAntigo.joiaId, itemAntigo.precoUnitario);
+      }
+      const joiaAntiga = this.joias.find(j => j.id === itemAntigo.joiaId);
+      if (joiaAntiga) {
+        joiaAntiga.quantidadeEstoque += itemAntigo.quantidade;
+      }
+    }
+
+    try {
+      for (const item of payload.itens) {
+        if (item.quantidade <= 0) {
+          throw new Error('A quantidade de cada item deve ser maior que zero.');
+        }
+        const joia = this.joias.find(j => j.id === item.joiaId);
+        if (!joia) throw new Error(`Joia ID ${item.joiaId} não encontrada.`);
+        if (!joia.ativo) throw new Error(`A joia "${joia.nome}" está inativa e não pode ser vendida.`);
+        if (item.quantidade > joia.quantidadeEstoque) {
+          throw new Error(`Estoque insuficiente para a joia "${joia.nome}". Disponível: ${joia.quantidadeEstoque}, Solicitado: ${item.quantidade}.`);
+        }
+      }
+    } catch (err) {
+      for (const itemAntigo of venda.itens) {
+        const joiaAntiga = this.joias.find(j => j.id === itemAntigo.joiaId);
+        if (joiaAntiga) {
+          joiaAntiga.quantidadeEstoque -= itemAntigo.quantidade;
+        }
+      }
+      throw err;
+    }
+
+    let novoTotal = 0;
+    const novosItens = payload.itens.map((item, idx) => {
+      const joia = this.joias.find(j => j.id === item.joiaId)!;
+      joia.quantidadeEstoque -= item.quantidade;
+      const precoPraticado = precosOriginais.get(item.joiaId) ?? joia.preco;
+      novoTotal += precoPraticado * item.quantidade;
+      return {
+        id: idx + 1,
+        joiaId: item.joiaId,
+        quantidade: item.quantidade,
+        precoUnitario: precoPraticado,
+      };
+    });
+
+    venda.clienteId = cliente.id;
+    venda.itens = novosItens;
+    venda.valorTotal = novoTotal;
+    return venda;
+  }
+
   cancelarVenda(vendaId: number): Venda {
     const venda = this.vendas.find(v => v.id === vendaId);
     if (!venda) throw new Error('Venda não encontrada.');
-    // Regra 24: Venda cancelada não pode ser cancelada novamente
     if (venda.status === 'CANCELADA') {
       throw new Error('Esta venda já se encontra cancelada.');
     }
 
-    // Regra 23: Ao cancelar, o estoque de todos os itens é devolvido
     for (const item of venda.itens) {
       const joia = this.joias.find(j => j.id === item.joiaId);
       if (joia) {

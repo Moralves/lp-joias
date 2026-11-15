@@ -7,10 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Operação de venda registrada no caixa (PDV) por um funcionário autenticado.
- * Agrega seus {@link ItemVenda} e calcula o {@code valorTotal} a partir dos preços unitários praticados.
- */
 @Entity
 @Table(name = "vendas")
 public class Venda {
@@ -90,10 +86,6 @@ public class Venda {
         return valorTotal;
     }
 
-    public void setValorTotal(BigDecimal valorTotal) {
-        this.valorTotal = valorTotal;
-    }
-
     public LocalDateTime getDataVenda() {
         return dataVenda;
     }
@@ -112,10 +104,6 @@ public class Venda {
 
     public List<ItemVenda> getItens() {
         return itens;
-    }
-
-    public void setItens(List<ItemVenda> itens) {
-        this.itens = itens;
     }
 }
 

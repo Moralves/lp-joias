@@ -16,11 +16,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
-/**
- * Regras transacionais do PDV (Frente de Caixa):
- * validação atômica de estoque, baixa/estorno automático, congelamento de preço unitário
- * e edição integral de vendas concluídas.
- */
 @Service
 public class VendaService {
 
@@ -87,14 +82,12 @@ public class VendaService {
         Cliente novoCliente = findActiveClienteOrThrow(request.clienteId());
         validateItensRequest(request.itens());
 
-        // Preserva o preço unitário praticado para itens que permanecerem na venda
         Map<Long, BigDecimal> precosOriginais = new HashMap<>();
         for (ItemVenda itemAntigo : venda.getItens()) {
             precosOriginais.put(itemAntigo.getJoia().getId(), itemAntigo.getPrecoUnitario());
             itemAntigo.getJoia().estornarEstoque(itemAntigo.getQuantidade());
         }
 
-        // Remove os itens antigos e força flush para evitar violação de UK (venda_id, joia_id) ao reinserir
         venda.limparItens();
         vendaRepository.saveAndFlush(venda);
 

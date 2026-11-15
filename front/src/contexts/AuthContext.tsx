@@ -44,6 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleMock = () => {
     const next = !isMock;
     setMockMode(next);
+    const token = authService.getToken();
+    if (!next && token && token.startsWith('mock-jwt-token-')) {
+      authService.logout();
+      setUser(null);
+    }
     setIsMock(next);
   };
 

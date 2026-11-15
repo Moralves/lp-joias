@@ -3,11 +3,6 @@ package com.lproyale.joalheria.domain.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * Item individual de uma {@link Venda}.
- * Armazena o {@code precoUnitario} histórico praticado no momento da venda
- * para que alterações futuras de catálogo não distorçam vendas passadas.
- */
 @Entity
 @Table(
         name = "itens_venda",
@@ -50,14 +45,6 @@ public class ItemVenda {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Venda getVenda() {
-        return venda;
-    }
-
     public void setVenda(Venda venda) {
         this.venda = venda;
     }
@@ -66,24 +53,12 @@ public class ItemVenda {
         return joia;
     }
 
-    public void setJoia(Joia joia) {
-        this.joia = joia;
-    }
-
     public Integer getQuantidade() {
         return quantidade;
     }
 
-    public void setQuantidade(Integer quantidade) {
-        this.quantidade = quantidade;
-    }
-
     public BigDecimal getPrecoUnitario() {
         return precoUnitario;
-    }
-
-    public void setPrecoUnitario(BigDecimal precoUnitario) {
-        this.precoUnitario = precoUnitario;
     }
 }
 

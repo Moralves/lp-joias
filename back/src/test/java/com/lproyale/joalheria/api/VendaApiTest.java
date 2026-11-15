@@ -38,7 +38,6 @@ class VendaApiTest extends BaseApiTest {
                 .post("/joias")
                 .then().statusCode(201).extract().path("id");
 
-        // 1. Registro da venda com 2 itens (2x joia1 + 1x joia2 = 2500.00)
         Integer vendaId = given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -59,13 +58,11 @@ class VendaApiTest extends BaseApiTest {
                 .extract()
                 .path("id");
 
-        // Verifica baixa de estoque pós-venda (joia1: 5-2=3, joia2: 4-1=3)
         given().header("Authorization", "Bearer " + token).get("/joias/" + joia1Id)
                 .then().statusCode(200).body("quantidadeEstoque", equalTo(3));
         given().header("Authorization", "Bearer " + token).get("/joias/" + joia2Id)
                 .then().statusCode(200).body("quantidadeEstoque", equalTo(3));
 
-        // 2. Edição da venda: altera para 1x joia1 e 3x joia2 (1000 + 1500 = 2500)
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
@@ -82,13 +79,11 @@ class VendaApiTest extends BaseApiTest {
                 .statusCode(200)
                 .body("valorTotal", equalTo(2500.0f));
 
-        // Verifica estoque após edição (joia1: 5-1=4, joia2: 4-3=1)
         given().header("Authorization", "Bearer " + token).get("/joias/" + joia1Id)
                 .then().statusCode(200).body("quantidadeEstoque", equalTo(4));
         given().header("Authorization", "Bearer " + token).get("/joias/" + joia2Id)
                 .then().statusCode(200).body("quantidadeEstoque", equalTo(1));
 
-        // 3. Cancelamento da venda -> status CANCELADA e estorno integral do estoque
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()

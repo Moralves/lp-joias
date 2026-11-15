@@ -9,10 +9,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuração do Swagger / OpenAPI 3 com suporte a autenticação Bearer JWT
- * para facilitar demonstrações e inspeção dos contratos REST.
- */
 @Configuration
 public class OpenApiConfig {
 
@@ -24,7 +20,7 @@ public class OpenApiConfig {
                         .title("L&P Royale — API de Gestão e Vendas de Joalheria")
                         .version("1.0.0")
                         .description("API RESTful em Spring Boot + PostgreSQL para controle de operadores, clientes, catálogo/estoque de joias e PDV.")
-                        .contact(new Contact().name("Mor e Mor — Projeto N2 Testes de Software")))
+                        .contact(new Contact().name("Layane e Pedro Moreira — Projeto N2 Testes de Software")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components().addSecuritySchemes(securitySchemeName,
                         new SecurityScheme()

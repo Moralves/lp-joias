@@ -13,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Regras de negócio de operadores (funcionários):
- * unicidade de e-mail, hash BCrypt de senha, soft delete e bloqueio de auto-inativação.
- */
 @Service
 public class UsuarioService {
 

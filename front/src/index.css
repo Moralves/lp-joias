@@ -28,7 +28,6 @@
   }
 }
 
-/* Custom scrollbars for POS tables and lists */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

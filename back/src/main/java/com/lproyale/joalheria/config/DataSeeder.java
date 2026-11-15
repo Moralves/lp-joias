@@ -13,11 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Popula o banco PostgreSQL com dados iniciais idempotentes na primeira inicialização
- * (espelhando os dados de homologação do front-end com senhas criptografadas em BCrypt).
- * Desabilitado no perfil {@code test} para que cada teste controle suas próprias massas.
- */
 @Component
 @Profile("!test")
 public class DataSeeder implements CommandLineRunner {

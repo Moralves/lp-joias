@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
-/**
- * Serviço responsável por emitir e validar tokens JWT assinados com HMAC-SHA256.
- */
 @Service
 public class JwtService {
 

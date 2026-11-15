@@ -1,11 +1,10 @@
-// ==========================================
-// Serviço de Vendas e PDV (Caixa)
-// ==========================================
 import { api } from './api';
 import { isMockModeExplicit, isNetworkError } from './clientHelper';
 import { localStore } from './store';
 import { authService } from './authService';
 import type { Venda, VendaPayload } from '../types';
+
+const OFFLINE_MSG = 'Servidor da API Spring Boot indisponível em http://localhost:8080. Verifique se o back-end está em execução.';
 
 export const vendasService = {
   async getAll(): Promise<Venda[]> {
@@ -16,7 +15,7 @@ export const vendasService = {
       const res = await api.get<Venda[]>('/vendas');
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.getVendas();
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Falha ao buscar histórico de vendas.');
     }
   },
@@ -31,11 +30,7 @@ export const vendasService = {
       const res = await api.get<Venda>(`/vendas/${id}`);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) {
-        const v = localStore.getVendas().find(venda => venda.id === id);
-        if (!v) throw new Error('Venda não encontrada.');
-        return v;
-      }
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao carregar detalhes da venda.');
     }
   },
@@ -51,10 +46,21 @@ export const vendasService = {
       const res = await api.post<Venda>('/vendas', payload);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) {
-        return localStore.createVenda(payload, currentUserId);
-      }
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao registrar venda no sistema.');
+    }
+  },
+
+  async update(id: number, payload: VendaPayload): Promise<Venda> {
+    if (isMockModeExplicit()) {
+      return localStore.updateVenda(id, payload);
+    }
+    try {
+      const res = await api.put<Venda>(`/vendas/${id}`, payload);
+      return res.data;
+    } catch (err: any) {
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
+      throw new Error(err.response?.data?.message || 'Erro ao atualizar a venda.');
     }
   },
 
@@ -66,7 +72,7 @@ export const vendasService = {
       const res = await api.delete<Venda>(`/vendas/${id}`);
       return res.data;
     } catch (err: any) {
-      if (isNetworkError(err)) return localStore.cancelarVenda(id);
+      if (isNetworkError(err)) throw new Error(OFFLINE_MSG);
       throw new Error(err.response?.data?.message || 'Erro ao cancelar a venda.');
     }
   }

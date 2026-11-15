@@ -4,6 +4,7 @@ import type { Joia, Cliente, VendaPayload } from '../types';
 import { joiasService } from '../services/joiasService';
 import { clientesService } from '../services/clientesService';
 import { vendasService } from '../services/vendasService';
+import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 
@@ -13,26 +14,24 @@ interface CartItem {
 }
 
 export const PDV: React.FC = () => {
+  const { isMock } = useAuth();
   const [joias, setJoias] = useState<Joia[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filtros de busca
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('TODAS');
 
-  // Estado do Carrinho / Cupom
   const [selectedClienteId, setSelectedClienteId] = useState<number | ''>('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [formaPagamento, setFormaPagamento] = useState<string>('CARTAO_CREDITO');
 
   const loadData = async () => {
     setLoading(true);
     try {
       const [joiasData, clientesData] = await Promise.all([
-        joiasService.getAll(false), // apenas ativas
-        clientesService.getAll(false), // apenas ativos
+        joiasService.getAll(false),
+        clientesService.getAll(false),
       ]);
       setJoias(joiasData);
       setClientes(clientesData);
@@ -48,7 +47,7 @@ export const PDV: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [isMock]);
 
   const categories = ['TODAS', ...Array.from(new Set(joias.map((j) => j.categoria)))];
 
@@ -141,7 +140,6 @@ export const PDV: React.FC = () => {
         'success'
       );
 
-      // Limpa cupom e recarrega dados para atualizar estoque em tela
       clearCart();
       await loadData();
     } catch (err: any) {
@@ -154,7 +152,6 @@ export const PDV: React.FC = () => {
   return (
     <div className="space-y-5">
 
-      {/* Terminal Header & Status Bar */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs flex items-center justify-between transition-colors">
         <div>
           <div className="flex items-center space-x-2">
@@ -165,13 +162,10 @@ export const PDV: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Workspace: Product Catalog (Left) + Sale Receipt (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-        {/* Catálogo de Produtos / Joias (Col 7 / 12) */}
         <div className="lg:col-span-7 space-y-4">
 
-          {/* Barra de Pesquisa e Filtros */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs space-y-3 transition-colors">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -185,7 +179,6 @@ export const PDV: React.FC = () => {
               />
             </div>
 
-            {/* Categorias */}
             <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs">
               {categories.map((cat) => (
                 <button
@@ -203,7 +196,6 @@ export const PDV: React.FC = () => {
             </div>
           </div>
 
-          {/* Grid de Itens do Catálogo */}
           {loading ? (
             <div className="p-12 text-center text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono transition-colors">
               Carregando catálogo de joias...
@@ -277,10 +269,8 @@ export const PDV: React.FC = () => {
           )}
         </div>
 
-        {/* Cupom Fiscal / Painel de Venda (Col 5 / 12) */}
         <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 lg:sticky lg:top-20 shadow-xs transition-colors">
 
-          {/* Cabeçalho do Cupom */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
               Cupom de Venda
@@ -295,7 +285,6 @@ export const PDV: React.FC = () => {
             )}
           </div>
 
-          {/* Seleção de Cliente */}
           <div className="mt-3.5">
             <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
               Cliente Comprador *
@@ -318,7 +307,6 @@ export const PDV: React.FC = () => {
             </select>
           </div>
 
-          {/* Lista de Itens do Cupom */}
           <div className="mt-4 border-t border-slate-200 dark:border-slate-800 pt-3">
             <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
               <span>Itens Selecionados</span>
@@ -350,7 +338,6 @@ export const PDV: React.FC = () => {
                     </div>
 
                     <div className="flex items-center space-x-2 shrink-0">
-                      {/* Controles de Quantidade */}
                       <div className="flex items-center border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 shadow-2xs">
                         <button
                           type="button"
@@ -389,81 +376,18 @@ export const PDV: React.FC = () => {
             )}
           </div>
 
-          {/* Seleção de Forma de Pagamento */}
-          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
-            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-              Forma de Pagamento
-            </span>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => setFormaPagamento('CARTAO_CREDITO')}
-                className={`p-2 rounded-lg border text-center transition-colors cursor-pointer ${
-                  formaPagamento === 'CARTAO_CREDITO'
-                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 dark:border-amber-700 text-amber-950 dark:text-amber-200 font-semibold shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Cartão Crédito
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormaPagamento('CARTAO_DEBITO')}
-                className={`p-2 rounded-lg border text-center transition-colors cursor-pointer ${
-                  formaPagamento === 'CARTAO_DEBITO'
-                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 dark:border-amber-700 text-amber-950 dark:text-amber-200 font-semibold shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Cartão Débito
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormaPagamento('PIX')}
-                className={`p-2 rounded-lg border text-center transition-colors cursor-pointer ${
-                  formaPagamento === 'PIX'
-                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 dark:border-amber-700 text-amber-950 dark:text-amber-200 font-semibold shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Pix Instantâneo
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormaPagamento('DINHEIRO')}
-                className={`p-2 rounded-lg border text-center transition-colors cursor-pointer ${
-                  formaPagamento === 'DINHEIRO'
-                    ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 dark:border-amber-700 text-amber-950 dark:text-amber-200 font-semibold shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Dinheiro Espécie
-              </button>
-            </div>
-          </div>
-
-          {/* Resumo Financeiro & Display de Total */}
           <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
             <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
               <span>Quantidade de Peças:</span>
               <span className="font-mono text-slate-900 dark:text-slate-200 font-semibold">{totalPecas} un.</span>
             </div>
-            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-              <span>Subtotal dos Produtos:</span>
-              <span className="font-mono text-slate-900 dark:text-slate-200">{formatCurrency(cartTotal)}</span>
-            </div>
-            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-              <span>Desconto Aplicado:</span>
-              <span className="font-mono text-slate-500 dark:text-slate-400">R$ 0,00</span>
-            </div>
 
-            {/* Display de Total do PDV (100% Light no modo claro; Escuro refinado no modo dark) */}
             <div className="bg-amber-50/90 dark:bg-slate-900 border border-amber-300 dark:border-slate-800 rounded-xl p-3.5 mt-2 flex items-center justify-between shadow-xs transition-colors">
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-amber-900 dark:text-slate-300 block">
-                  Total Líquido
+                  Valor Total
                 </span>
-                <span className="text-xs text-amber-700/80 dark:text-slate-400">À vista ou parcelado</span>
+                <span className="text-xs text-amber-700/80 dark:text-slate-400">Soma dos itens do cupom</span>
               </div>
               <span
                 data-testid="cart-total-value"
@@ -473,7 +397,6 @@ export const PDV: React.FC = () => {
               </span>
             </div>
 
-            {/* Botão de Finalização */}
             <button
               type="button"
               onClick={handleConfirmarVenda}

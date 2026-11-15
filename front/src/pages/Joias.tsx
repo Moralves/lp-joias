@@ -2,21 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Edit2, Trash2, RotateCcw, Package, AlertTriangle } from 'lucide-react';
 import type { Joia } from '../types';
 import { joiasService } from '../services/joiasService';
+import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 import { Modal } from '../components/ui/Modal';
 
 export const Joias: React.FC = () => {
+  const { isMock } = useAuth();
   const [joias, setJoias] = useState<Joia[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
 
-  // Modais
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editJoia, setEditJoia] = useState<Joia | null>(null);
   const [stockJoia, setStockJoia] = useState<Joia | null>(null);
 
-  // Form states
   const [formNome, setFormNome] = useState('');
   const [formCategoria, setFormCategoria] = useState('Anel');
   const [formMaterial, setFormMaterial] = useState('Ouro 18k');
@@ -38,7 +38,7 @@ export const Joias: React.FC = () => {
 
   useEffect(() => {
     loadJoias();
-  }, [showInactive]);
+  }, [showInactive, isMock]);
 
   const handleOpenCreate = () => {
     setFormNome('');
@@ -148,7 +148,6 @@ export const Joias: React.FC = () => {
   return (
     <div className="space-y-5">
       
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-serif">
@@ -181,7 +180,6 @@ export const Joias: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs transition-colors">
         {loading ? (
           <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-xs font-mono">Carregando catálogo de joias...</div>
@@ -302,7 +300,6 @@ export const Joias: React.FC = () => {
         )}
       </div>
 
-      {/* Modal: Cadastrar Nova Joia */}
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Cadastrar Nova Peça no Acervo">
         <form onSubmit={handleCreate} className="space-y-4 text-xs">
           <div>
@@ -395,7 +392,6 @@ export const Joias: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Modal: Editar Joia */}
       <Modal isOpen={!!editJoia} onClose={() => setEditJoia(null)} title={`Ficha Cadastral da Joia #${editJoia?.id}`}>
         {editJoia && (
           <form onSubmit={handleUpdate} className="space-y-4 text-xs">
@@ -475,7 +471,6 @@ export const Joias: React.FC = () => {
         )}
       </Modal>
 
-      {/* Modal: Reposição de Estoque */}
       <Modal isOpen={!!stockJoia} onClose={() => setStockJoia(null)} title={`Ajuste de Saldo Físico: ${stockJoia?.nome}`}>
         {stockJoia && (
           <form onSubmit={handleAdjustStock} className="space-y-4 text-xs">

@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
-/**
- * Centraliza o tratamento de exceções da API REST em respostas JSON padronizadas,
- * garantindo códigos HTTP semânticos (400, 401, 403, 404, 409) e mensagens claras.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

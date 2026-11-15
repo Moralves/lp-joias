@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: lp-joalheria-api
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/lp_joias}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    # Chave HS256 em Base64 (>= 256 bits). Em produção, definir via variável de ambiente JWT_SECRET.
+    secret: ${JWT_SECRET:TFBSb3lhbGUtSm9hbGhlcmlhLVNlY3JldC1LZXktMjAyNi1Qcm9qZXRvLU4yLVRlc3Rlcw==}
+    expiration-ms: ${JWT_EXPIRATION_MS:28800000} # 8 horas (expediente de caixa)
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+

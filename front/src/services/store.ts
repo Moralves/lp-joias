@@ -26,8 +26,8 @@ class LocalStore {
       const email = u.email.toLowerCase();
       return (
         email === input ||
-        email.replace('@lproyale.com.br', '@aurea.com.br') === input ||
-        email.replace('@aurea.com.br', '@lproyale.com.br') === input
+        email.replace('@lpjoias.com.br', '@aurea.com.br') === input ||
+        email.replace('@aurea.com.br', '@lpjoias.com.br') === input
       );
     });
     if (!user) {

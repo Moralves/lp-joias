@@ -1,4 +1,4 @@
-# L&P Royale — Sistema de Gestão e Vendas de Joalheria
+# L&P Joias — Sistema de Gestão e Vendas de Joalheria
 
 **Disciplina:** Testes de Software | Projeto N2  
 **Professor:** Reinaldo de Souza Junior  
@@ -8,7 +8,7 @@
 
 ## 1. Proposta e Visão Geral do Sistema
 
-O **L&P Royale** é um sistema web local de alta performance desenvolvido para gerenciar as operações de balcão e retaguarda de uma joalheria física. O sistema foi concebido com foco na experiência do usuário (UI/UX limpa, moderna e responsiva com suporte a modo claro/escuro), integridade transacional e **testabilidade automatizada** em todas as camadas da pirâmide de testes.
+O **L&P Joias** é um sistema web local de alta performance desenvolvido para gerenciar as operações de balcão e retaguarda de uma joalheria física. O sistema foi concebido com foco na experiência do usuário (UI/UX limpa, moderna e responsiva com suporte a modo claro/escuro), integridade transacional e **testabilidade automatizada** em todas as camadas da pirâmide de testes.
 
 ### Principais Funcionalidades e Políticas de Negócio
 - **Autenticação Stateless (JWT + BCrypt):** Controle de acesso de operadores/funcionários com bloqueio imediato (`HTTP 403`) para usuários inativos;
@@ -46,7 +46,7 @@ lp-joias/                                # Raiz do repositório
     ├── database/
     │   └── lp_joias_postgres.sql        # Script DDL PostgreSQL pronto para execução no DBeaver
     ├── src/
-    │   ├── main/java/com/lproyale/joalheria/
+    │   ├── main/java/com/lpjoias/joalheria/
     │   │   ├── config/                  # SecurityConfig, OpenApiConfig (Swagger), DataSeeder
     │   │   ├── security/                # JwtService, JwtAuthenticationFilter, UserPrincipal
     │   │   ├── domain/                  # Entidades JPA (Usuario, Cliente, Joia, Venda, ItemVenda) e Enums
@@ -55,7 +55,7 @@ lp-joias/                                # Raiz do repositório
     │   │   ├── service/                 # Regras de negócio, transações atômicas (@Transactional) e validações
     │   │   ├── controller/              # Endpoints REST (/api/auth, /usuarios, /clientes, /joias, /vendas)
     │   │   └── exception/               # Exceções semânticas e GlobalExceptionHandler (JSON padronizado)
-    │   └── test/java/com/lproyale/joalheria/
+    │   └── test/java/com/lpjoias/joalheria/
     │       ├── unit/                    # Testes Unitários com JUnit 5 + Mockito (12 testes)
     │       ├── api/                     # Testes de Integração de API com REST-assured (5 testes)
     │       └── e2e/                     # Testes End-to-End com Selenium WebDriver (3 testes)
@@ -134,13 +134,9 @@ erDiagram
 ### 4.2. Passo a Passo de Configuração no DBeaver
 
 1. Certifique-se de que o serviço do **PostgreSQL** está em execução na porta `5432`.
-2. No **DBeaver**, conecte-se ao seu servidor PostgreSQL (`localhost:5432`, usuário `postgres`).
-3. Abra um editor SQL no DBeaver e crie o banco de dados do projeto:
-   ```sql
-   CREATE DATABASE lp_joias;
-   ```
-4. *(Opcional)* Você pode consultar ou executar o script DDL completo em [`back/database/lp_joias_postgres.sql`](back/database/lp_joias_postgres.sql).
-5. Ao iniciar o back-end Spring Boot, o Hibernate valida/atualiza o schema automaticamente (`ddl-auto: update`) e o [`DataSeeder`](back/src/main/java/com/lproyale/joalheria/config/DataSeeder.java) popula os registros iniciais (com senhas criptografadas em BCrypt) caso o banco esteja vazio.
+2. No **DBeaver**, conecte-se ao seu servidor PostgreSQL (`localhost:5432`, usuário `postgres`, senha padrão `postgres`).
+3. Ao iniciar o back-end Spring Boot (`.\mvnw spring-boot:run`), a aplicação **cria automaticamente o banco de dados `lp_joias`** no PostgreSQL (caso ainda não exista), o Hibernate cria/atualiza as 5 tabelas (`ddl-auto: update`) e o [`DataSeeder`](back/src/main/java/com/lpjoias/joalheria/config/DataSeeder.java) popula todos os registros iniciais (com senhas criptografadas em BCrypt).
+4. *(Opcional)* Caso queira criar o banco ou consultar o DDL manualmente antes de iniciar a API, basta executar `CREATE DATABASE lp_joias;` no DBeaver ou consultar [`back/database/lp_joias_postgres.sql`](back/database/lp_joias_postgres.sql).
 
 ### 4.3. Variáveis de Ambiente do Banco (Opcionais)
 
@@ -188,9 +184,9 @@ No cabeçalho da aplicação há um indicador de conexão:
 
 | E-mail | Senha | Perfil | Status | Comportamento no Login |
 | :--- | :--- | :--- | :--- | :--- |
-| `carlos@lproyale.com.br` | `123456` | Operador de Caixa | **Ativo** | Acesso liberado (`200 OK` + JWT) |
-| `marina@lproyale.com.br` | `123456` | Gerente Geral | **Ativo** | Acesso liberado (`200 OK` + JWT) |
-| `lucas@lproyale.com.br` | `123456` | Antigo Operador | **Inativo** | Bloqueado pela Regra 9 (`403 Forbidden`) |
+| `carlos@lpjoias.com.br` | `123456` | Operador de Caixa | **Ativo** | Acesso liberado (`200 OK` + JWT) |
+| `marina@lpjoias.com.br` | `123456` | Gerente Geral | **Ativo** | Acesso liberado (`200 OK` + JWT) |
+| `lucas@lpjoias.com.br` | `123456` | Antigo Operador | **Inativo** | Bloqueado pela Regra 9 (`403 Forbidden`) |
 
 ---
 

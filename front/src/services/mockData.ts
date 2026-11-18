@@ -1,9 +1,9 @@
 import type { Usuario, Cliente, Joia, Venda } from '../types';
 
 export const INITIAL_USUARIOS: Usuario[] = [
-  { id: 1, nome: 'Carlos Silva', email: 'carlos@lproyale.com.br', ativo: true },
-  { id: 2, nome: 'Marina Costa', email: 'marina@lproyale.com.br', ativo: true },
-  { id: 3, nome: 'Lucas Antigo', email: 'lucas@lproyale.com.br', ativo: false },
+  { id: 1, nome: 'Carlos Silva', email: 'carlos@lpjoias.com.br', ativo: true },
+  { id: 2, nome: 'Marina Costa', email: 'marina@lpjoias.com.br', ativo: true },
+  { id: 3, nome: 'Lucas Antigo', email: 'lucas@lpjoias.com.br', ativo: false },
 ];
 
 export const INITIAL_CLIENTES: Cliente[] = [

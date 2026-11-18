@@ -13,7 +13,7 @@ export const AppLayout: React.FC = () => {
 
       <footer className="border-t border-slate-200 dark:border-slate-800 py-3 text-center text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 transition-colors">
         <p>
-          <strong className="text-slate-700 dark:text-slate-200 font-serif">L&amp;P Jóias</strong> &bull; Sistema de Gestão e Frente de Caixa (PDV) &bull; Terminal de Atendimento
+          <strong className="text-slate-700 dark:text-slate-200 font-serif">L&amp;P JOIAS</strong> &bull; Sistema de Gestão e Frente de Caixa (PDV) &bull; Terminal de Atendimento
         </p>
       </footer>
     </div>

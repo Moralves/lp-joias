@@ -1,4 +1,4 @@
-# Documento de Especificação de Requisitos de Software (ERS) — Sistema L&P Royale
+# Documento de Especificação de Requisitos de Software (ERS) — Sistema L&P Joias
 
 **Disciplina:** Testes de Software | Projeto N2  
 **Professor:** Reinaldo de Souza Junior  
@@ -9,10 +9,10 @@
 ## 1. Introdução e Objetivo do Sistema
 
 ### 1.1. Propósito
-Este documento especifica de forma completa os **Requisitos Funcionais (RF)**, **Requisitos Não Funcionais (RNF)**, **Regras de Negócio (RN)**, **Modelo de Dados Relacional**, **Contratos de Interface (API REST e DTOs)** e **Rastreabilidade de Testes Automatizados** do sistema **L&P Royale — Sistema de Gestão e Vendas de Joalheria**.
+Este documento especifica de forma completa os **Requisitos Funcionais (RF)**, **Requisitos Não Funcionais (RNF)**, **Regras de Negócio (RN)**, **Modelo de Dados Relacional**, **Contratos de Interface (API REST e DTOs)** e **Rastreabilidade de Testes Automatizados** do sistema **L&P Joias — Sistema de Gestão e Vendas de Joalheria**.
 
 ### 1.2. Escopo do Produto
-O **L&P Royale** é uma aplicação web Full Stack local projetada para operação em balcão e frente de caixa (PDV) por funcionários de uma joalheria física. O sistema integra uma **Single Page Application (SPA)** em React 19 + TypeScript a uma **API RESTful** em Java 21 + Spring Boot 3.4 persistida em **PostgreSQL**, garantindo:
+O **L&P Joias** é uma aplicação web Full Stack local projetada para operação em balcão e frente de caixa (PDV) por funcionários de uma joalheria física. O sistema integra uma **Single Page Application (SPA)** em React 19 + TypeScript a uma **API RESTful** em Java 21 + Spring Boot 3.4 persistida em **PostgreSQL**, garantindo:
 - Autenticação segura *stateless* via JWT e senhas criptografadas com BCrypt;
 - Gestão completa de operadores/usuários, clientes, catálogo de joias, estoque físico e operações de venda;
 - Controle transacional atômico de baixa e estorno de estoque;
@@ -309,7 +309,7 @@ erDiagram
   "usuario": {
     "id": 1,
     "nome": "Carlos Silva",
-    "email": "carlos@lproyale.com.br",
+    "email": "carlos@lpjoias.com.br",
     "ativo": true
   },
   "valorTotal": 3290.00,

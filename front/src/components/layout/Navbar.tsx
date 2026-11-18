@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-lg font-bold tracking-wider text-slate-900 dark:text-white font-serif">
-                L&amp;P JÓIAS
+                L&amp;P JOIAS
               </span>
             </div>
             <p className="text-[10px] tracking-wide text-slate-500 dark:text-slate-400 uppercase -mt-0.5">

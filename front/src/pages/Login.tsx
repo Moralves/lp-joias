@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { showToast } from '../components/ui/ToastNotification';
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('carlos@lproyale.com.br');
+  const [email, setEmail] = useState('carlos@lpjoias.com.br');
   const [senha, setSenha] = useState('123456');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
 
     try {
       await login({ email, senha });
-      showToast('Autenticação autorizada. Terminal L&P Jóias liberado para operação.', 'success');
+      showToast('Autenticação autorizada. Terminal L&P JOIAS liberado para operação.', 'success');
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Falha na autenticação do operador.');
@@ -61,7 +61,7 @@ export const Login: React.FC = () => {
             <Gem className="w-6 h-6 stroke-[2.2]" />
           </div>
           <h1 className="text-2xl font-bold tracking-widest text-slate-900 dark:text-white font-serif">
-            L&amp;P JÓIAS
+            L&amp;P JOIAS
           </h1>
           <p className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-1 font-mono">
             Terminal de Vendas &bull; Frente de Caixa
@@ -88,7 +88,7 @@ export const Login: React.FC = () => {
               data-testid="input-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="operador@lproyale.com.br"
+              placeholder="operador@lpjoias.com.br"
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
             />
           </div>
@@ -125,7 +125,7 @@ export const Login: React.FC = () => {
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => setPreset('carlos@lproyale.com.br')}
+              onClick={() => setPreset('carlos@lpjoias.com.br')}
               className="text-xs bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-left transition-colors cursor-pointer"
             >
               <span className="font-semibold text-slate-900 dark:text-white block text-[11px]">Carlos Silva</span>
@@ -133,7 +133,7 @@ export const Login: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => setPreset('marina@lproyale.com.br')}
+              onClick={() => setPreset('marina@lpjoias.com.br')}
               className="text-xs bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-left transition-colors cursor-pointer"
             >
               <span className="font-semibold text-slate-900 dark:text-white block text-[11px]">Marina Costa</span>
@@ -142,7 +142,7 @@ export const Login: React.FC = () => {
           </div>
           <button
             type="button"
-            onClick={() => setPreset('lucas@lproyale.com.br')}
+            onClick={() => setPreset('lucas@lpjoias.com.br')}
             className="w-full mt-2 text-[11px] bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 py-1.5 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-center transition-colors cursor-pointer"
           >
             Lucas Antigo &bull; Operador Inativo (Teste de Bloqueio)

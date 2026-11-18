@@ -11,11 +11,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.lproyale</groupId>
+    <groupId>com.lpjoias</groupId>
     <artifactId>lp-joalheria-api</artifactId>
     <version>1.0.0</version>
-    <name>L&amp;P Royale - Joalheria API</name>
-    <description>Backend REST API em Spring Boot com PostgreSQL para o sistema de gestão e vendas L&amp;P Royale</description>
+    <name>L&amp;P Joias - Joalheria API</name>
+    <description>Backend REST API em Spring Boot com PostgreSQL para o sistema de gestão e vendas L&amp;P Joias</description>
 
     <properties>
         <java.version>21</java.version>

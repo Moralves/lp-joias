@@ -262,7 +262,7 @@ export const Usuarios: React.FC = () => {
               data-testid="input-usuario-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="operador@lproyale.com.br"
+              placeholder="operador@lpjoias.com.br"
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             />
           </div>

@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Edit2, Trash2, RotateCcw, Package, AlertTriangle } from 'lucide-react';
 import type { Joia } from '../types';
 import { joiasService } from '../services/joiasService';
-import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 import { Modal } from '../components/ui/Modal';
 
 export const Joias: React.FC = () => {
-  const { isMock } = useAuth();
   const [joias, setJoias] = useState<Joia[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
@@ -38,7 +36,7 @@ export const Joias: React.FC = () => {
 
   useEffect(() => {
     loadJoias();
-  }, [showInactive, isMock]);
+  }, [showInactive]);
 
   const handleOpenCreate = () => {
     setFormNome('');

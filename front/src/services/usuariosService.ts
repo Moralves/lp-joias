@@ -1,6 +1,5 @@
 import { api } from './api';
-import { isMockModeExplicit, isNetworkError } from './clientHelper';
-import { localStore } from './store';
+import { isNetworkError } from './clientHelper';
 import { authService } from './authService';
 import type { Usuario } from '../types';
 
@@ -8,9 +7,6 @@ const OFFLINE_MSG = 'Servidor da API Spring Boot indisponível em http://localho
 
 export const usuariosService = {
   async getAll(includeInactive = false): Promise<Usuario[]> {
-    if (isMockModeExplicit()) {
-      return localStore.getUsuarios(includeInactive);
-    }
     try {
       const url = includeInactive ? '/usuarios?ativo=false' : '/usuarios';
       const res = await api.get<Usuario[]>(url);
@@ -22,9 +18,6 @@ export const usuariosService = {
   },
 
   async create(data: Omit<Usuario, 'id' | 'ativo'> & { senha?: string }): Promise<Usuario> {
-    if (isMockModeExplicit()) {
-      return localStore.createUsuario(data);
-    }
     try {
       const res = await api.post<Usuario>('/usuarios', data);
       return res.data;
@@ -35,9 +28,6 @@ export const usuariosService = {
   },
 
   async update(id: number, data: Partial<Usuario> & { senha?: string }): Promise<Usuario> {
-    if (isMockModeExplicit()) {
-      return localStore.updateUsuario(id, data);
-    }
     try {
       const res = await api.put<Usuario>(`/usuarios/${id}`, data);
       return res.data;
@@ -53,9 +43,6 @@ export const usuariosService = {
       throw new Error('Não é permitido inativar o próprio usuário logado (409 Conflict).');
     }
 
-    if (isMockModeExplicit()) {
-      return localStore.inativarUsuario(id, current?.id || 0);
-    }
     try {
       await api.delete(`/usuarios/${id}`);
     } catch (err: any) {
@@ -68,9 +55,6 @@ export const usuariosService = {
   },
 
   async reactivate(id: number): Promise<Usuario> {
-    if (isMockModeExplicit()) {
-      return localStore.reativarUsuario(id);
-    }
     try {
       const res = await api.put<Usuario>(`/usuarios/${id}/reativar`);
       return res.data;

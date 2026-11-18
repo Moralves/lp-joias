@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, isMock, toggleMock } = useAuth();
+  const { user, logout } = useAuth();
   const { toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,20 +62,6 @@ export const Navbar: React.FC = () => {
         </nav>
 
         <div className="flex items-center space-x-2 sm:space-x-3">
-
-          <button
-            type="button"
-            onClick={toggleMock}
-            title={isMock ? 'Operando em Simulação Local — Clique para conectar à API Spring Boot' : 'Conectado à API Spring Boot (PostgreSQL) — Clique para alternar'}
-            className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border transition-colors cursor-pointer ${
-              isMock
-                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${isMock ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-            {isMock ? 'Modo Local' : 'API Spring Boot'}
-          </button>
 
           <button
             type="button"

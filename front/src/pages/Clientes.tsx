@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Edit2, Ban, RotateCcw } from 'lucide-react';
 import type { Cliente } from '../types';
 import { clientesService } from '../services/clientesService';
-import { useAuth } from '../contexts/AuthContext';
 import { formatCPF, formatPhone } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 import { Modal } from '../components/ui/Modal';
 
 export const Clientes: React.FC = () => {
-  const { isMock } = useAuth();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
@@ -35,7 +33,7 @@ export const Clientes: React.FC = () => {
 
   useEffect(() => {
     loadClientes();
-  }, [showInactive, isMock]);
+  }, [showInactive]);
 
   const handleOpenCreate = () => {
     setEditCliente(null);

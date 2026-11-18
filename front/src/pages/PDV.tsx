@@ -4,7 +4,6 @@ import type { Joia, Cliente, VendaPayload } from '../types';
 import { joiasService } from '../services/joiasService';
 import { clientesService } from '../services/clientesService';
 import { vendasService } from '../services/vendasService';
-import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 
@@ -14,7 +13,6 @@ interface CartItem {
 }
 
 export const PDV: React.FC = () => {
-  const { isMock } = useAuth();
   const [joias, setJoias] = useState<Joia[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +45,7 @@ export const PDV: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [isMock]);
+  }, []);
 
   const categories = ['TODAS', ...Array.from(new Set(joias.map((j) => j.categoria)))];
 

@@ -1,8 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
-export const TOKEN_KEY = 'aurea_token';
-export const USER_KEY = 'aurea_user';
-export const MOCK_MODE_KEY = 'aurea_mock_mode';
+export const TOKEN_KEY = 'lp_joias_token';
+export const USER_KEY = 'lp_joias_user';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -33,4 +32,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-

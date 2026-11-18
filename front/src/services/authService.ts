@@ -1,23 +1,16 @@
 import { api, TOKEN_KEY, USER_KEY } from './api';
-import { isMockModeExplicit, isNetworkError, setMockMode } from './clientHelper';
-import { localStore } from './store';
+import { isNetworkError } from './clientHelper';
 import type { LoginCredentials, AuthResponse, Usuario } from '../types';
 
 export const authService = {
   async login(creds: LoginCredentials): Promise<AuthResponse> {
-    if (isMockModeExplicit()) {
-      const res = localStore.login(creds);
-      this.setSession(res.token, res.usuario);
-      return res;
-    }
     try {
       const response = await api.post<AuthResponse>('/auth/login', creds);
-      setMockMode(false);
       this.setSession(response.data.token, response.data.usuario);
       return response.data;
     } catch (err: any) {
       if (isNetworkError(err)) {
-        throw new Error('Servidor da API Spring Boot indisponível em http://localhost:8080. Inicie o back-end ou alterne para Simulação Local.');
+        throw new Error('Servidor da API Spring Boot indisponível em http://localhost:8080. Verifique se o back-end está em execução.');
       }
       const message = err.response?.data?.message || err.message || 'Erro ao realizar login.';
       throw new Error(message);

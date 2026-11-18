@@ -34,10 +34,10 @@ lp-joias/                                # Raiz do repositório
 ├── front/                               # Front-End SPA (React 19 + TypeScript + Vite + Tailwind CSS)
 │   ├── src/
 │   │   ├── components/                  # Navbar, AppLayout, Modal e ToastNotification
-│   │   ├── contexts/                    # AuthContext (JWT / Modo Conexão) e ThemeContext (Light/Dark)
+│   │   ├── contexts/                    # AuthContext (JWT) e ThemeContext (Light/Dark)
 │   │   ├── pages/                       # Login, PDV, Vendas, Joias, Clientes e Usuarios
 │   │   ├── routes/                      # AppRoutes e guarda de rotas PrivateRoute
-│   │   ├── services/                    # Cliente Axios (api.ts), Serviços REST e Simulação Local
+│   │   ├── services/                    # Cliente Axios (api.ts) e Serviços REST
 │   │   ├── types/                       # Interfaces e contratos TypeScript
 │   │   └── utils/                       # Formatadores de moeda (BRL), CPF, telefone e data/hora
 │   ├── vite.config.ts                   # Proxy reverso /api -> http://localhost:8080
@@ -173,11 +173,6 @@ npm run dev
 - **Aplicação Web:** `http://localhost:5173`
 - **Build de Produção / Validação TypeScript:** `npm run build`
 
-### 5.3. Modos de Operação do Front-End (Dual-Mode Engine)
-No cabeçalho da aplicação há um indicador de conexão:
-1. **Modo `API Spring Boot` (Padrão):** Comunica-se diretamente com o back-end em `http://localhost:8080/api` (via proxy do Vite), persistindo todas as operações no PostgreSQL.
-2. **Modo `Modo Local` (Fallback / Simulação):** Ativado automaticamente caso o back-end esteja offline ou alternado manualmente no botão do cabeçalho, aplicando em memória todas as 26 regras de negócio do escopo.
-
 ---
 
 ## 6. Credenciais de Homologação (DataSeeder)
@@ -224,13 +219,37 @@ No cabeçalho da aplicação há um indicador de conexão:
 
 ## 8. Suíte de Testes Automatizados (Unitários, API e E2E)
 
-### 8.1. Executar Testes Unitários (JUnit 5 + Mockito) e de API (REST-assured)
-Os testes de back-end utilizam o perfil `test` com banco H2 em modo de compatibilidade PostgreSQL (`MODE=PostgreSQL`), garantindo execução rápida, isolada e determinística:
+### 8.1. Comandos para Execução dos Testes
+Os testes utilizam o perfil `test` de forma isolada e determinística. Todos os comandos abaixo devem ser executados dentro da pasta `/back`:
 
-```powershell
-cd back
-.\mvnw test
-```
+- **1. Executar apenas os Testes Unitários (JUnit 5 + Mockito — 12 testes):**
+  ```powershell
+  cd back
+  .\mvnw test "-Dtest=*UnitTest"
+  ```
+- **2. Executar apenas os Testes de Integração de API (REST-assured — 5 testes):**
+  ```powershell
+  cd back
+  .\mvnw test "-Dtest=*ApiTest"
+  ```
+- **3. Executar Testes Unitários + Integração de API juntos (17 testes):**
+  ```powershell
+  cd back
+  .\mvnw test "-Dtest=*UnitTest,*ApiTest"
+  ```
+- **4. Executar os Testes End-to-End de Interface (Selenium WebDriver — 3 testes):**
+  ```powershell
+  cd back
+  .\mvnw test -Dtest=VendaSeleniumE2ETest
+  ```
+  *(Opcional — para executar em modo invisível/headless: `.\mvnw test -Dtest=VendaSeleniumE2ETest -Dheadless=true`)*
+- **5. Executar Toda a Suíte Completa (Unitários + API + E2E — 20 testes):**
+  ```powershell
+  cd back
+  .\mvnw test
+  ```
+
+### 8.2. Detalhamento das Camadas de Teste
 
 - **Testes Unitários (`back/src/test/.../unit/`):**
   - `JoiaServiceUnitTest`: validação de preço positivo, bloqueio `409 Conflict` ao alterar dados cadastrais de joia vendida, permissão de reposição de estoque e exclusão física vs inativação lógica.
@@ -240,14 +259,13 @@ cd back
   - `AuthAndUsuarioApiTest`: fluxo completo de token JWT, bloqueio `401` sem token, bloqueio `403` para usuário inativo, auto-inativação `409` e reativação.
   - `JoiaAndClienteApiTest`: ciclo de cliente (criação, CPF duplicado `409`, inativação, filtro `?ativo=false`, reativação) e regras de joia vendida (`409` cadastral, `PATCH /estoque`, `DELETE` lógico vs físico).
   - `VendaApiTest`: registro com 2 joias distintas, conferência de estoque pós-baixa, edição atômica (`PUT`) e cancelamento (`DELETE`) com estorno integral verificado.
-
 - **Testes End-to-End de Interface (`back/src/test/.../e2e/`):**
-  - `VendaSeleniumE2ETest` (Selenium WebDriver + Chrome Headless): executa os fluxos reais na interface React compilada (`front/dist`) integrada ao back-end Spring Boot:
+  - `VendaSeleniumE2ETest` (Selenium WebDriver + Chrome): executa os fluxos reais na interface React compilada (`front/dist`) integrada ao back-end Spring Boot:
     1. Login pela tela (`/login`) validando o operador autenticado no cabeçalho (`[data-testid="user-name"]`);
     2. Registro de venda no PDV (`/`) com 2 joias distintas, validação da notificação (`[data-testid="toast-message"]`) e conferência da baixa de estoque no banco;
     3. Cancelamento da venda na tela de histórico (`/vendas`) com confirmação de diálogo e verificação do status `CANCELADA` (`[data-testid="status-venda-{id}"]`) e do estorno integral de estoque.
 
-### 8.2. Arquitetura de Seletores para Testes E2E (Selenium WebDriver)
+### 8.3. Arquitetura de Seletores para Testes E2E (Selenium WebDriver)
 Os três cenários mandatórios de interface possuem seletores semânticos `data-testid` dedicados:
 
 1. **Cenário 1 — Login com Sucesso:**

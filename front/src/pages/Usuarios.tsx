@@ -11,7 +11,7 @@ export const Usuarios: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
 
-  const { user: currentUser, isMock } = useAuth();
+  const { user: currentUser } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUsuario, setEditUsuario] = useState<Usuario | null>(null);
@@ -34,7 +34,7 @@ export const Usuarios: React.FC = () => {
 
   useEffect(() => {
     loadUsuarios();
-  }, [showInactive, isMock]);
+  }, [showInactive]);
 
   const handleOpenCreate = () => {
     setEditUsuario(null);

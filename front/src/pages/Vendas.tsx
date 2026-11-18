@@ -4,13 +4,11 @@ import type { Venda, Cliente, Joia } from '../types';
 import { vendasService } from '../services/vendasService';
 import { clientesService } from '../services/clientesService';
 import { joiasService } from '../services/joiasService';
-import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { showToast } from '../components/ui/ToastNotification';
 import { Modal } from '../components/ui/Modal';
 
 export const Vendas: React.FC = () => {
-  const { isMock } = useAuth();
   const [vendas, setVendas] = useState<Venda[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVenda, setSelectedVenda] = useState<Venda | null>(null);
@@ -37,7 +35,7 @@ export const Vendas: React.FC = () => {
 
   useEffect(() => {
     loadVendas();
-  }, [isMock]);
+  }, []);
 
   const handleCancelar = async (venda: Venda) => {
     if (venda.status === 'CANCELADA') {

@@ -4,6 +4,8 @@
 **Professor:** Reinaldo de Souza Junior  
 **Integrantes:** Layane Lino e Pedro Moreira  
 
+> **Vídeo de Apresentação do Sistema e Execução dos Testes:** [Assistir no YouTube (https://youtu.be/nqep0PnvtP4)](https://youtu.be/nqep0PnvtP4) | Pasta: [`/video`](video/README.md)
+
 ---
 
 ## 1. Proposta e Visão Geral do Sistema
@@ -28,6 +30,8 @@ O **L&P Joias** é um sistema web local de alta performance desenvolvido para ge
 ```
 lp-joias/                                # Raiz do repositório
 ├── README.md                            # Documentação unificada (Front-End + Back-End + Banco + Testes)
+├── video/                               # Vídeo de apresentação do sistema e execução da suíte de testes
+│   └── README.md                        # Link direto e player/miniatura da apresentação no YouTube
 ├── docs/                                # Especificação de requisitos (ERS) e edital da disciplina
 │   ├── Avaliação N2.pdf
 │   └── Escopo_Joalheria.md
